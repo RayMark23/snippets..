@@ -37,6 +37,7 @@
 		],
 		"description": "Create a new Flask application with MySQL database connection."
 	},
+
 	"Flask app to run": {
 		"prefix": "f-run",
 		"body":[
@@ -47,8 +48,9 @@
 		],
 		"description": "To run.py."
 	},
-	"Flask app routes": {
-		"prefix": "f-routes",
+
+	"Flask app routes main": {
+		"prefix": "f-routes-main",
 		"body":[
 "from sample_app import app, mysql",
 "from flask import jsonify, redirect, render_template, request, session",
@@ -63,7 +65,13 @@
 "        cursor.close()",
 "        return render_template('index.html', products=products)",
 "",
+],
+"description": "To show main routes"
+},
 
+"Flask app routes submit": {
+	"prefix": "f-routes-submit_order",
+	"body":[
 "@app.route('/submit_order', methods=['POST'])",
 "def submit_order():",
 "    cursor = mysql.connection.cursor()",
@@ -98,7 +106,13 @@
       
 "        cursor.close()",
 "",
+],
+"description": "To show submit routes"
+},
 
+"Flask app routes orders": {
+	"prefix": "f-routes-orders",
+	"body":[
 "@app.route('/orders')",
 "def orders():",
 "    cursor = mysql.connection.cursor()",
@@ -131,6 +145,6 @@
 "",
 "    return render_template('orders.html', orders_data=formatted_orders_data)",
 		],
-		"description": "To show routes"
+		"description": "To show orders routes"
 }
 }
