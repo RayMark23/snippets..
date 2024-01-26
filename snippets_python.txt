@@ -1,0 +1,136 @@
+{
+	// Place your snippets for python here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Flask app with MySQL": {
+		"prefix": "f-init",
+		"body":[
+			"from flask import Flask",
+			"from flask_mysqldb import MySQL",
+"",
+			"app = Flask(__name__)",
+"",
+			"app.config['MYSQL_HOST'] = 'localhost'",
+			"app.config['MYSQL_USER'] = 'root'",
+			"app.config['MYSQL_PASSWORD'] = ''",
+			"app.config['MYSQL_DB'] = 'sample_kiosk'",
+"",
+			"mysql = MySQL(app)",
+"",
+
+
+			"app.config.update(",
+    			"TESTING=True,",
+    			"SECRET_KEY='192b9bdd22ab9ed4d12e236c78afcb9a393ec15f71bbf5dc987d54727823bcbf')",
+"",
+			"from sample_app import routes"
+		],
+		"description": "Create a new Flask application with MySQL database connection."
+	},
+	"Flask app to run": {
+		"prefix": "f-run",
+		"body":[
+"from sample_app import app",
+"",
+"if __name__ == '__main__':",
+"	app.run(debug=True)"
+		],
+		"description": "To run.py."
+	},
+	"Flask app routes": {
+		"prefix": "f-routes",
+		"body":[
+"from sample_app import app, mysql",
+"from flask import jsonify, redirect, render_template, request, session",
+"",
+
+"@app.route('/')",
+"def index():",
+"        cursor = mysql.connection.cursor()",
+"        cursor.execute('SELECT * FROM products')  # Assuming 'products' is your table name",
+"        products = cursor.fetchall()",
+"        print(products)",
+"        cursor.close()",
+"        return render_template('index.html', products=products)",
+"",
+
+"@app.route('/submit_order', methods=['POST'])",
+"def submit_order():",
+"    cursor = mysql.connection.cursor()",
+"",
+"    try:",
+      
+"        product_id = int(request.form['productId'])",
+"        quantity = float(request.form['quantity'])",
+"        total_price = float(request.form['totalPrice'])",
+"        mobile_number = request.form['mobileNumber']",
+        "",
+       
+"        order_query = 'INSERT INTO orders (total_price, customer_contact) VALUES (%s, %s)'",
+"        cursor.execute(order_query, (total_price, mobile_number))",
+"        order_id = cursor.connection.insert_id()  # Get the last inserted id",
+"",
+     
+"        order_items_query = 'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (%s, %s, %s, %s)'",
+"        cursor.execute(order_items_query, (order_id, product_id, quantity, total_price))",
+"",
+      
+"        mysql.connection.commit()",
+"",
+        
+"        session['order_submitted'] = True",
+"        return redirect ('/')",
+"    except Exception as e:",
+     
+"        mysql.connection.rollback()",
+"        return jsonify(success=False, error=str(e)), 500",
+"    finally:",
+      
+"        cursor.close()",
+"",
+
+"@app.route('/orders')",
+"def orders():",
+"    cursor = mysql.connection.cursor()",
+"    sql = '''",
+"    SELECT",
+"        o.order_id,",
+"        o.date_time as order_date,", 
+"        o.customer_contact,", 
+"        o.total_price as order_total_price,",
+"        p.name as product_name,", 
+"        p.price_per_unit,", 
+"        p.image_url,", 
+"        oi.quantity",
+"    FROM orders o",
+"    JOIN order_items oi ON o.order_id = oi.order_id",
+"    JOIN products p ON oi.product_id = p.product_id",
+"    '''",
+"    cursor.execute(sql)",
+"    orders_data = cursor.fetchall()",
+"    cursor.close()",
+"",
+"    formatted_orders_data = []",
+"    for order in orders_data:",
+        
+"        formatted_order_date = order[1].strftime('%B %d, %Y at %I:%M:%S %p')",
+"",
+       
+"        formatted_order = order[:1] + (formatted_order_date,) + order[2:]",
+"        formatted_orders_data.append(formatted_order)",
+"",
+"    return render_template('orders.html', orders_data=formatted_orders_data)",
+		],
+		"description": "To show routes"
+}
+}
