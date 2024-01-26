@@ -238,7 +238,7 @@
 			"description": "To show orders"
 			},
 
-			"Print to layout": {
+			"Print to order": {
 				"prefix": "order-html",
 				"body": [
 "{% extends 'layout.html' %} {% block content %}",
